@@ -1,0 +1,30 @@
+steps:
+
+#REGELEN DEPENDENCIES
+- name: node
+  entrypoint: npm
+  args: ['install']
+- name: node
+  entrypoint: npm
+  args: ['test']
+#EINDE REGELEN DEPENDENCIES
+
+#MAKEN DOCKER IMAGE
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/peppy-breaker-278616/node', '.']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/peppy-breaker-278616/node']
+#EINDE MAKEN DOCKER IMAGE
+
+#INFRA NEERZETTEN
+- id: terraform-init
+  name: hashicorp/terraform:0.12.4
+  args: ['init']
+  env:
+    - 'GOOGLE_APPLICATION_CREDENTIALS=cred.json'
+
+- id: terraform-apply
+  name: hashicorp/terraform:0.12.4
+  args: ['apply', '-auto-approve']
+
